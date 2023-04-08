@@ -198,7 +198,7 @@ if __name__ == '__main__':
     password = getpass('请输入您的密码：')
     print("题库基本全，不需要再爬取")
     flag = input('爬题库(0)/自测或考试(1):')
-    if int(flag) == 1:
+    if int(flag) == 1:  #自测或考试
         mode = input('请输入模式-自测(0)/考试(1)：')
         week = input('请输入第几周(数字)：')
         answerTime = input('请输入答题时间(整数)(单位/min)(建议7min)：')
@@ -209,11 +209,11 @@ if __name__ == '__main__':
             print("检测到您开启了准确模式，最终时间为上面答题时间加上手动做答的时间，两者之和务必不要超过8min")
             print(f"不在题库中的题目会在{answerTime}分钟后弹出，记得做完！！！且控制时间！！！")
         paperID = answerPaper(myToken, mode, week, int(answerTime),int(precise))
-        #自测完后顺便更新题库
+        #自测或考试完后顺便更新题库
         dic = get_tiku(myToken, paperID)
         dic_list = dic["list"]
         ku = {}
-        with open("ku.txt", "r") as f:
+        with open("new_ku.txt", "r") as f:
             data = f.read()
             data = json.loads(data)
             ku = data
@@ -226,11 +226,11 @@ if __name__ == '__main__':
                 answer = dic_list[i][f"answer{answerID}"].split(' ')[0]
                 ku[title] = answer
 
-        with open("ku.txt", "w") as f:
+        with open("new_ku.txt", "w") as f:
             f.write(json.dumps(ku))
             f.close()
 
-    else:
+    else:   #爬取题库
         mode = 0
         week = input('请输入第几周(数字)：')
         x = input('爬取题库次数(每爬一次要等待8min，自测模式爬取):')
@@ -241,7 +241,7 @@ if __name__ == '__main__':
             dic = get_tiku(myToken, paperID)
             dic_list = dic["list"]
             ku = {}
-            with open("ku.txt", "r") as f:
+            with open("new_ku.txt", "r") as f:
                 data = f.read()
                 data = json.loads(data)
                 ku = data
@@ -254,7 +254,7 @@ if __name__ == '__main__':
                     answer = dic_list[i][f"answer{answerID}"].split(' ')[0]
                     ku[title] = answer
 
-            with open("ku.txt", "w") as f:
+            with open("new_ku.txt", "w") as f:
                 f.write(json.dumps(ku))
                 f.close()
             time.sleep(480)
