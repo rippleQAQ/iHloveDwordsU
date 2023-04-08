@@ -58,7 +58,6 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
     if precise == 1:
         paper = getData(X_Auth_Token, mode, week)
         paperID = paper['paperId']
-        print(paper)
         time.sleep(answerTime * 60)  # 测试时可关闭,正式使用时请打开
         test = paper["list"]
         answerList = []
@@ -68,7 +67,7 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
             answerB = test[i]["answerB"].split(' ')[0]
             answerC = test[i]["answerC"].split(' ')[0]
             answerD = test[i]["answerD"].split(' ')[0]
-            if (title in ku.keys()):
+            if title in ku.keys():
                 if ku[title] == answerA:
                     answerList.append('A')
                 elif ku[title] == answerB:
@@ -78,7 +77,18 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
                 elif ku[title] == answerD:
                     answerList.append('D')
                 else:
-                    answerList.append('C')
+                    print("有题库之外的题目:")
+                    print(f"第{i + 1}题：")
+                    print(title)
+                    print("A:" + str(answerA))
+                    print("B:" + str(answerB))
+                    print("C:" + str(answerC))
+                    print("D:" + str(answerD))
+                    x = input('请手动输入（字母大写，其他符号默认为C）：')
+                    if x in ['A', 'B', 'C', 'D']:
+                        answerList.append(x)
+                    else:
+                        answerList.append('C')
             else:
                 print("有题库之外的题目:")
                 print(f"第{i+1}题：")
@@ -106,7 +116,6 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
     else:
         paper = getData(X_Auth_Token, mode, week)
         paperID = paper['paperId']
-        print(paper)
         time.sleep(answerTime * 60)  # 测试时可关闭,正式使用时请打开
         test = paper["list"]
         answerList = []
@@ -116,7 +125,7 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
             answerB = test[i]["answerB"].split(' ')[0]
             answerC = test[i]["answerC"].split(' ')[0]
             answerD = test[i]["answerD"].split(' ')[0]
-            if (title in ku.keys()):
+            if title in ku.keys():
                 if ku[title] == answerA:
                     answerList.append('A')
                 elif ku[title] == answerB:
@@ -143,7 +152,6 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
 
 def answerPaper_for_tiku(X_Auth_Token, mode, week):
     paper = getData(X_Auth_Token, mode, week)
-    print(paper)
     paperID = paper['paperId']
     with open('answerList', 'r') as f:
         answerSource = f.read()
@@ -181,23 +189,25 @@ def get_tiku(x_token, ID):
 
 if __name__ == '__main__':
     ku = {}
-    with open('ku.txt', 'r') as f:
+    with open('new_ku.txt', 'r') as f:
         data = f.read()
         data = json.loads(data)
         ku = data
         f.close()
-    print(ku)
     username = input('请输入您的学号：')
-    password = input('请输入您的密码：')
-    print("如果不确定题库能跑多少分，可以自测试试，70分左右为正常，分数较低的话请先爬题库")
+    password = getpass('请输入您的密码：')
+    print("题库基本全，不需要再爬取")
     flag = input('爬题库(0)/自测或考试(1):')
     if int(flag) == 1:
         mode = input('请输入模式-自测(0)/考试(1)：')
         week = input('请输入第几周(数字)：')
-        precise = input('是否开启准确模式(不在题库中的约30道题目手动选择，请注意答题时间！！超过8min会很尴尬)-0关闭，1启动：')
-        print("请控制时间让结果比较合理，最后时间为答题时间加上准确模式中手动做题的时间！开准确模式建议0min后面自己扣时间到约8min")
-        answerTime = input('请输入答题时间(单位/min)：')
+        answerTime = input('请输入答题时间(整数)(单位/min)(建议7min)：')
+        precise = input("是否开启准确模式(不在题库中的题目手动做答)(0:关闭 1：开启):")
         myToken = token(username, password)
+        print(f"脚本将在{answerTime}分钟后正式启动，期间请勿关闭脚本")
+        if int(precise) == 1:
+            print("检测到您开启了准确模式，最终时间为上面答题时间加上手动做答的时间，两者之和务必不要超过8min")
+            print(f"不在题库中的题目会在{answerTime}分钟后弹出，记得做完！！！且控制时间！！！")
         paperID = answerPaper(myToken, mode, week, int(answerTime),int(precise))
         #自测完后顺便更新题库
         dic = get_tiku(myToken, paperID)
