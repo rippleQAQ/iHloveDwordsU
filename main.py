@@ -208,7 +208,7 @@ if __name__ == '__main__':
         print(f"脚本将在{answerTime}分钟后正式启动，期间请勿关闭脚本")
         if int(precise) == 1:
             print("检测到您开启了准确模式，最终时间为上面答题时间加上手动做答的时间，两者之和务必不要超过8min")
-            print(f"不在题库中的题目会在{answerTime}分钟后弹出，记得做完！！！且控制手动做题时间在{8 - answerTime}分钟时间内！！！")
+            print(f"不在题库中的题目会在{int(answerTime)}分钟后弹出，记得做完！！！且控制手动做题时间在{8 - int(answerTime)}分钟时间内！！！")
         paperID = answerPaper(myToken, mode, week, int(answerTime),int(precise))
         #自测或考试完后顺便更新题库
         dic = get_tiku(myToken, paperID)
@@ -259,5 +259,4 @@ if __name__ == '__main__':
                 f.write(json.dumps(ku))
                 f.close()
             time.sleep(480)
-    print("脚本已结束，将在1分钟后自动退出")
-    time.sleep(60)
+
