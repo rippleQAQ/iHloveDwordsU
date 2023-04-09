@@ -201,13 +201,14 @@ if __name__ == '__main__':
     if int(flag) == 1:  #自测或考试
         mode = input('请输入模式-自测(0)/考试(1)：')
         week = input('请输入第几周(数字)：')
-        answerTime = input('请输入答题时间(整数)(单位/min)(建议7min)：')
-        precise = input("是否开启准确模式(不在题库中的题目手动做答)(0:关闭 1：开启):")
+        answerTime = input('请输入答题时间(整数)(单位/min)(建议填7)：')
+        print("准确模式是指不在题库中的题目手动做答，最终时间为上面答题时间加上手动做答的时间，如果开启请扣好时间，两者之和务必不要超过8min")
+        precise = input("是否开启准确模式(0:关闭 1：开启):")
         myToken = token(username, password)
         print(f"脚本将在{answerTime}分钟后正式启动，期间请勿关闭脚本")
         if int(precise) == 1:
             print("检测到您开启了准确模式，最终时间为上面答题时间加上手动做答的时间，两者之和务必不要超过8min")
-            print(f"不在题库中的题目会在{answerTime}分钟后弹出，记得做完！！！且控制时间！！！")
+            print(f"不在题库中的题目会在{answerTime}分钟后弹出，记得做完！！！且控制手动做题时间在{8 - answerTime}分钟时间内！！！")
         paperID = answerPaper(myToken, mode, week, int(answerTime),int(precise))
         #自测或考试完后顺便更新题库
         dic = get_tiku(myToken, paperID)
@@ -258,3 +259,5 @@ if __name__ == '__main__':
                 f.write(json.dumps(ku))
                 f.close()
             time.sleep(480)
+    print("脚本已结束，将在1分钟后自动退出")
+    time.sleep(60)
