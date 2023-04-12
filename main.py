@@ -4,6 +4,7 @@ import requests
 import uuid
 import json
 import time
+import random
 
 def getData(x_token, mode, week):
     # 获取当前时间戳
@@ -54,113 +55,57 @@ def postData(answer, x_token):
     }
     requests.post(url, headers=postHeaders, data=answer)
 
-def answerPaper(X_Auth_Token, mode, week, answerTime,precise):
-    if precise == 1:
-        paper = getData(X_Auth_Token, mode, week)
-        paperID = paper['paperId']
-        time.sleep(answerTime * 60)  # 测试时可关闭,正式使用时请打开
-        test = paper["list"]
-        answerList = []
-        for i in range(100):
-            title = test[i]["title"].split(' ')[0]
-            answerA = test[i]["answerA"].split(' ')[0]
-            answerB = test[i]["answerB"].split(' ')[0]
-            answerC = test[i]["answerC"].split(' ')[0]
-            answerD = test[i]["answerD"].split(' ')[0]
-            if title in ku.keys():
-                if ku[title] == answerA:
-                    answerList.append('A')
-                elif ku[title] == answerB:
-                    answerList.append('B')
-                elif ku[title] == answerC:
-                    answerList.append('C')
-                elif ku[title] == answerD:
-                    answerList.append('D')
-                else:
-                    print("有题库之外的题目:")
-                    print(f"第{i + 1}题：")
-                    print(title)
-                    print("A:" + str(answerA))
-                    print("B:" + str(answerB))
-                    print("C:" + str(answerC))
-                    print("D:" + str(answerD))
-                    x = input('请手动输入（字母大写，其他符号默认为C）：')
-                    if x in ['A', 'B', 'C', 'D']:
-                        answerList.append(x)
-                    else:
-                        answerList.append('C')
-            else:
-                print("有题库之外的题目:")
-                print(f"第{i+1}题：")
-                print(title)
-                print("A:"+ str(answerA))
-                print("B:"+ str(answerB))
-                print("C:"+ str(answerC))
-                print("D:"+ str(answerD))
-                x = input('请手动输入（字母大写，其他符号默认为C）：')
-                if x in ['A','B','C','D']:
-                    answerList.append(x)
-                else:
-                    answerList.append('C')
-
-        with open('answerList', 'r') as f:
-            answerSource = f.read()
-            f.close()
-        answerDic = json.loads(answerSource)
-        answerDic['paperId'] = paper['paperId']
-        for i in range(0, 100):
-            answerDic['list'][i]['input'] = answerList[i]
-            answerDic['list'][i]['paperDetailId'] = paper['list'][i]['paperDetailId']
-        postData(json.dumps(answerDic), X_Auth_Token)
-
-    else:
-        paper = getData(X_Auth_Token, mode, week)
-        paperID = paper['paperId']
-        time.sleep(answerTime * 60)  # 测试时可关闭,正式使用时请打开
-        test = paper["list"]
-        answerList = []
-        for i in range(100):
-            title = test[i]["title"].split(' ')[0]
-            answerA = test[i]["answerA"].split(' ')[0]
-            answerB = test[i]["answerB"].split(' ')[0]
-            answerC = test[i]["answerC"].split(' ')[0]
-            answerD = test[i]["answerD"].split(' ')[0]
-            if title in ku.keys():
-                if ku[title] == answerA:
-                    answerList.append('A')
-                elif ku[title] == answerB:
-                    answerList.append('B')
-                elif ku[title] == answerC:
-                    answerList.append('C')
-                elif ku[title] == answerD:
-                    answerList.append('D')
-                else:
-                    answerList.append('C')
-            else:
-                answerList.append('C')
-
-        with open('answerList', 'r') as f:
-            answerSource = f.read()
-            f.close()
-        answerDic = json.loads(answerSource)
-        answerDic['paperId'] = paper['paperId']
-        for i in range(0, 100):
-            answerDic['list'][i]['input'] = answerList[i]
-            answerDic['list'][i]['paperDetailId'] = paper['list'][i]['paperDetailId']
-        postData(json.dumps(answerDic), X_Auth_Token)
-    return paperID
-
-def answerPaper_for_tiku(X_Auth_Token, mode, week):
+def answerPaper(X_Auth_Token, mode, week, answerTime,score):
+    cnt = 0
+    rand = []
     paper = getData(X_Auth_Token, mode, week)
     paperID = paper['paperId']
+    test = paper["list"]
+    time.sleep(answerTime)  # 测试时可关闭,正式使用时请打开
+    answerList = []
+    index = ['A','B','C','D']
+    for i in range(100):
+        title = test[i]["title"].split(' ')[0]
+        answerA = test[i]["answerA"].split(' ')[0]
+        answerB = test[i]["answerB"].split(' ')[0]
+        answerC = test[i]["answerC"].split(' ')[0]
+        answerD = test[i]["answerD"].split(' ')[0]
+        if [title,answerA] in ku:
+            answerList.append('A')
+        elif [title,answerB] in ku:
+            answerList.append('B')
+        elif [title,answerC] in ku:
+            answerList.append('C')
+        elif [title,answerD] in ku:
+            answerList.append('D')
+        else:
+            answerList.append('C')
+            cnt+=1
+
+    if 100 - cnt > score:
+        a = 100 - cnt - score
+        while len(rand) < a:
+            x = random.randint(0, 99)
+            if x not in rand:
+                rand.append(x)
+
+        for j in rand:
+            y = random.choice(index)
+            while y == answerList[j]:
+                y = random.choice(index)
+            answerList[j] = y
+
     with open('answerList', 'r') as f:
         answerSource = f.read()
         f.close()
     answerDic = json.loads(answerSource)
+
     answerDic['paperId'] = paper['paperId']
     for i in range(0, 100):
+        answerDic['list'][i]['input'] = answerList[i]
         answerDic['list'][i]['paperDetailId'] = paper['list'][i]['paperDetailId']
     postData(json.dumps(answerDic), X_Auth_Token)
+
     return paperID
 
 def get_tiku(x_token, ID):
@@ -188,75 +133,43 @@ def get_tiku(x_token, ID):
     return json.loads(response.text)
 
 if __name__ == '__main__':
-    ku = {}
-    with open('new_ku.txt', 'r') as f:
+    with open('new_ku_list.txt', 'r') as f:
         data = f.read()
         data = json.loads(data)
         ku = data
         f.close()
     username = input('请输入您的学号：')
     password = getpass('请输入您的密码：')
-    print("题库基本全，不需要再爬取")
-    flag = input('爬题库(0)/自测或考试(1):')
-    if int(flag) == 1:  #自测或考试
-        mode = input('请输入模式-自测(0)/考试(1)：')
-        week = input('请输入第几周(数字)：')
-        answerTime = input('请输入答题时间(整数)(单位/min)(建议填7)：')
-        print("准确模式是指不在题库中的题目手动做答，最终时间为上面答题时间加上手动做答的时间，如果开启请扣好时间，两者之和务必不要超过8min")
-        precise = input("是否开启准确模式(0:关闭 1：开启):")
-        myToken = token(username, password)
-        print(f"脚本将在{answerTime}分钟后正式启动，期间请勿关闭脚本")
-        if int(precise) == 1:
-            print("检测到您开启了准确模式，最终时间为上面答题时间加上手动做答的时间，两者之和务必不要超过8min")
-            print(f"不在题库中的题目会在{int(answerTime)}分钟后弹出，记得做完！！！且控制手动做题时间在{8 - int(answerTime)}分钟时间内！！！")
-        paperID = answerPaper(myToken, mode, week, int(answerTime),int(precise))
-        #自测或考试完后顺便更新题库
-        dic = get_tiku(myToken, paperID)
-        dic_list = dic["list"]
-        ku = {}
-        with open("new_ku.txt", "r") as f:
-            data = f.read()
-            data = json.loads(data)
-            ku = data
-            f.close()
 
-        for i in range(100):
-            title = dic_list[i]["title"].split(' ')[0]
-            if title not in ku.keys():
-                answerID = dic_list[i]["answer"]
-                answer = dic_list[i][f"answer{answerID}"].split(' ')[0]
-                ku[title] = answer
+    mode = input('请输入模式-自测(0)/考试(1)：')
+    week = input('请输入第几周(数字)(经测试只能做本周的题目，输入对应周即可)：')
+    print("为避免误输入，答题时间在240~480范围外的默认460")
+    answerTime = int(input('请输入答题时间(整数,注意单位为秒！)(单位/s)(建议填460)：'))
+    if answerTime < 240 or answerTime > 480:
+        answerTime = 460
+    score = int(input('请输入你想要的分数(结果可能稍有偏差)：'))
+    if score < 0 or score > 100:
+        score = 100
+    myToken = token(username, password)
+    print(f"脚本将在{answerTime}秒后正式启动，期间请勿关闭脚本")
+    paperID = answerPaper(myToken, mode, week, answerTime,score)
+    #自测或考试完后顺便更新题库
+    dic = get_tiku(myToken, paperID)
+    dic_list = dic["list"]
+    with open("new_ku_list.txt", "r") as f:
+        data = f.read()
+        data = json.loads(data)
+        ku = data
+        f.close()
 
-        with open("new_ku.txt", "w") as f:
-            f.write(json.dumps(ku))
-            f.close()
+    for i in range(100):
+        title = dic_list[i]["title"].split(' ')[0]
+        answerID = dic_list[i]["answer"]
+        answer = dic_list[i][f"answer{answerID}"].split(' ')[0]
+        li = [title,answer]
+        if li not in ku:
+                ku.append(li)
 
-    else:   #爬取题库
-        mode = 0
-        week = input('请输入第几周(数字)：')
-        x = input('爬取题库次数(每爬一次要等待8min，自测模式爬取):')
-        print("用自测暴力得到题库")
-        myToken = token(username, password)
-        for a in range(int(x)):
-            paperID = answerPaper_for_tiku(myToken, mode, week)
-            dic = get_tiku(myToken, paperID)
-            dic_list = dic["list"]
-            ku = {}
-            with open("new_ku.txt", "r") as f:
-                data = f.read()
-                data = json.loads(data)
-                ku = data
-                f.close()
-
-            for i in range(100):
-                title = dic_list[i]["title"].split(' ')[0]
-                if title not in ku.keys():
-                    answerID = dic_list[i]["answer"]
-                    answer = dic_list[i][f"answer{answerID}"].split(' ')[0]
-                    ku[title] = answer
-
-            with open("new_ku.txt", "w") as f:
-                f.write(json.dumps(ku))
-                f.close()
-            time.sleep(480)
-
+    with open("new_ku_list.txt", "w") as f:
+        f.write(json.dumps(ku))
+        f.close()
