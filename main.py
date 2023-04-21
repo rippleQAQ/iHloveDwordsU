@@ -145,8 +145,8 @@ if __name__ == '__main__':
     week = input('请输入第几周(数字)(经测试只能做本周的题目，输入对应周即可)：')
     print("为避免误输入，答题时间在240~480范围外的默认460")
     answerTime = int(input('请输入答题时间(整数,注意单位为秒！)(单位/s)(建议填460)：'))
-    if answerTime < 240 or answerTime > 480:
-        answerTime = 460
+    # if answerTime < 240 or answerTime > 480:
+    #     answerTime = 460
     score = int(input('请输入你想要的分数(结果可能稍有偏差)：'))
     if score < 0 or score > 100:
         score = 100
@@ -173,3 +173,6 @@ if __name__ == '__main__':
     with open("new_ku_list.txt", "w") as f:
         f.write(json.dumps(ku))
         f.close()
+
+    print("脚本结束，将在10秒后自动退出")
+    time.sleep(10)
