@@ -7,9 +7,9 @@
 需要python环境，安装requests和PyExecJS库
 
 运行main.py
-
-
-  
+```
+python main.py
+```
   
 
 莫名其妙退出了的话请检查账号密码是否输入正确，输入的格式是否正确（比如输入了浮点数之类的）
