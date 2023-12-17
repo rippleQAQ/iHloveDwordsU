@@ -61,7 +61,11 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,score):
     paper = getData(X_Auth_Token, mode, week)
     paperID = paper['paperId']
     test = paper["list"]
-    time.sleep(answerTime)  # 测试时可关闭,正式使用时请打开
+    while answerTime>5: # 测试时可关闭,正式使用时请打开
+        answerTime=answerTime-5
+        print("剩余",answerTime,"秒")
+        time.sleep(5)
+    time.sleep(answerTime)
     answerList = []
     index = ['A','B','C','D']
     for i in range(100):
