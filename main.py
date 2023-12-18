@@ -63,10 +63,11 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,score):
     test = paper["list"]
     while answerTime>1: # 测试时可关闭,正式使用时请打开
         print('\r' + ' ' * 50 + '\r', end='', flush=True)
+        print("剩余",answerTime,"秒", end='', flush=True)
         answerTime=answerTime-1
         time.sleep(1)
-        print("剩余",answerTime,"秒", end='', flush=True)
     time.sleep(answerTime)
+    print()
     answerList = []
     index = ['A','B','C','D']
     for i in range(100):
@@ -157,7 +158,6 @@ if __name__ == '__main__':
         answerTime = int(answerTime)
         if answerTime>480 or answerTime<120:
             answerTime = random.randint(120,480)
-    answerTime = answerTime/5
     print("\n为避免误输入,分数在0~100范围外的默认随机生成90~98间的一个数")
     score = input('请输入你想要的分数(结果可能稍有偏差),不输入默认随机生成90~98:')
     if score == '':
