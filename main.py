@@ -63,8 +63,8 @@ def answerPaper(X_Auth_Token, mode, week, answerTime,score):
     test = paper["list"]
     while answerTime>5: # 测试时可关闭,正式使用时请打开
         answerTime=answerTime-5
-        print("剩余",answerTime,"秒")
         time.sleep(5)
+        print("剩余",answerTime,"秒")
     time.sleep(answerTime)
     answerList = []
     index = ['A','B','C','D']
@@ -142,20 +142,31 @@ if __name__ == '__main__':
         data = json.loads(data)
         ku = data
         f.close()
-    username = input('请输入您的学号：')
-    password = getpass('请输入您的密码：')
+    username = input('请输入您的学号:')
+    password = getpass('请输入您的密码:')
 
-    mode = input('请输入模式-自测(0)/考试(1)：')
-    week = input('请输入第几周(数字)(经测试只能做本周的题目，输入对应周即可)：')
-    print("为避免误输入，答题时间在240~480范围外的默认460")
-    answerTime = int(input('请输入答题时间(整数,注意单位为秒！)(单位/s)(建议填460)：'))
-    # if answerTime < 240 or answerTime > 480:
-    #     answerTime = 460
-    score = int(input('请输入你想要的分数(结果可能稍有偏差)：'))
-    if score < 0 or score > 100:
-        score = 100
+    mode = input('请输入模式-自测(0)/考试(1):')
+    week = input('请输入第几周(数字)(经测试只能做本周的题目,输入对应周即可):')
+    print("为避免误输入,答题时间在120~480范围外的默认随机生成120~480间的一个数")
+    print("不输入表示生成一个120~480范围的随机数")
+    answerTime = input('请输入答题时间(整数,注意单位为秒！)(单位/s):')
+    if answerTime == '':
+        answerTime = random.randint(120,480)
+    else:
+        answerTime = int(answerTime)
+        if answerTime>480 or answerTime<120:
+            answerTime = random.randint(120,480)
+    answerTime = answerTime/5
+    print("\n为避免误输入,分数在0~100范围外的默认随机生成90~98间的一个数")
+    score = input('请输入你想要的分数(结果可能稍有偏差),不输入默认随机生成90~98:')
+    if score == '':
+        score = random.randint(90,98)
+    else:
+        score = int(score)
+        if score < 0 or score > 100:
+            score = random.randint(90,98)
     myToken = token(username, password)
-    print(f"脚本将在{answerTime}秒后正式启动，期间请勿关闭脚本")
+    print(f"脚本将在{answerTime}秒后正式启动,期间请勿关闭脚本")
     paperID = answerPaper(myToken, mode, week, answerTime,score)
     #自测或考试完后顺便更新题库
     dic = get_tiku(myToken, paperID)
@@ -178,5 +189,5 @@ if __name__ == '__main__':
         f.write(json.dumps(ku))
         f.close()
 
-    print("脚本结束，将在10秒后自动退出")
+    print("脚本结束,将在10秒后自动退出")
     time.sleep(10)
